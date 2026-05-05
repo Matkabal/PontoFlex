@@ -2,7 +2,11 @@
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
+const basePath = process.env.VITE_BASE_PATH || "/";
+const normalizedBase = basePath.endsWith("/") ? basePath : `${basePath}/`;
+
 export default defineConfig({
+  base: normalizedBase,
   plugins: [
     react(),
     VitePWA({
@@ -17,24 +21,24 @@ export default defineConfig({
         name: "PontoFlex",
         short_name: "PontoFlex",
         description: "Controle pessoal de ponto com funcionamento offline",
-        start_url: "/",
-        scope: "/",
+        start_url: normalizedBase,
+        scope: normalizedBase,
         display: "standalone",
         theme_color: "#0f766e",
         background_color: "#f2f7f6",
         icons: [
           {
-            src: "/icons/icon-192.png",
+            src: "icons/icon-192.png",
             sizes: "192x192",
             type: "image/png"
           },
           {
-            src: "/icons/icon-512.png",
+            src: "icons/icon-512.png",
             sizes: "512x512",
             type: "image/png"
           },
           {
-            src: "/icons/icon-maskable-512.png",
+            src: "icons/icon-maskable-512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable"
@@ -42,7 +46,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        navigateFallback: "/index.html",
+        navigateFallback: `${normalizedBase}index.html`,
         globPatterns: ["**/*.{js,css,html,png,svg,ico,webmanifest}"],
         runtimeCaching: [
           {
