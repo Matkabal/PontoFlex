@@ -64,3 +64,23 @@ Para instalar no iPhone:
 - Os dados ficam no IndexedDB do dispositivo.
 - Sem backend: as informações não são sincronizadas com nuvem.
 - Se virar o ano, o app tenta carregar feriados do novo ano apenas se ainda não existir cache local.
+
+## Deploy automático no GitHub Pages
+
+O projeto inclui workflow em `.github/workflows/deploy-pwa.yml` para publicar no GitHub Pages a cada push na `master`.
+
+Após subir para o GitHub:
+
+1. Abra o repositório no GitHub.
+2. Vá em **Settings > Pages**.
+3. Em **Build and deployment**, selecione **GitHub Actions**.
+4. Faça push na branch `master` para disparar o deploy.
+
+URL final padrão:
+
+- `https://SEU_USUARIO.github.io/PontoFlex/`
+
+## Direitos autorais
+
+© PontoFlex. Todos os direitos reservados.  
+É proibida a reprodução, cópia, modificação ou distribuição sem autorização prévia.

@@ -66,6 +66,12 @@ function App() {
         {tab === "help" ? <HelpPage /> : null}
       </main>
 
+      <footer className="app-footer">
+        <small>
+          © {new Date().getFullYear()} PontoFlex. Todos os direitos reservados. Reprodução, cópia ou distribuição sem autorização é proibida.
+        </small>
+      </footer>
+
       <AppMenuDrawer
         open={menuOpen}
         view={menuView}
