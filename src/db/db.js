@@ -10,6 +10,24 @@ db.version(1).stores({
   holidays: "++id,date,name"
 });
 
+db.version(2).stores({
+  sessions: "++id,start,end",
+  settings: "id,dailyMinutes",
+  holidays: "++id,date,year,source,name",
+  holidaySync: "year,syncedAt"
+}).upgrade(async (tx) => {
+  const rows = await tx.table("holidays").toArray();
+  for (const row of rows) {
+    if (!row.year && row.date) {
+      const year = Number(String(row.date).slice(0, 4));
+      await tx.table("holidays").update(row.id, {
+        year,
+        source: row.source || "manual"
+      });
+    }
+  }
+});
+
 export function getDefaultSettings() {
   return {
     id: "main",

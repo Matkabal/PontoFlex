@@ -1,7 +1,14 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import HolidayForm from "../components/HolidayForm";
 
-function SettingsPage({ settings, holidays, onSaveSettings, onAddHoliday, onDeleteHoliday }) {
+function SettingsPage({
+  settings,
+  holidays,
+  holidaySyncStatus,
+  onSaveSettings,
+  onAddHoliday,
+  onDeleteHoliday
+}) {
   const [weeklyHours, setWeeklyHours] = useState({});
 
   useEffect(() => {
@@ -14,13 +21,8 @@ function SettingsPage({ settings, holidays, onSaveSettings, onAddHoliday, onDele
 
   const labels = useMemo(() => ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"], []);
 
-  const setDayHours = (day, value) => {
-    setWeeklyHours((prev) => ({ ...prev, [day]: value }));
-  };
-
-  const toggleDay = (day) => {
-    setWeeklyHours((prev) => ({ ...prev, [day]: prev[day] > 0 ? 0 : 8 }));
-  };
+  const setDayHours = (day, value) => setWeeklyHours((prev) => ({ ...prev, [day]: value }));
+  const toggleDay = (day) => setWeeklyHours((prev) => ({ ...prev, [day]: prev[day] > 0 ? 0 : 8 }));
 
   const save = () => {
     const weeklyMinutes = {};
@@ -28,15 +30,21 @@ function SettingsPage({ settings, holidays, onSaveSettings, onAddHoliday, onDele
       const value = Number(weeklyHours[day] || 0);
       weeklyMinutes[day] = value > 0 ? Math.round(value * 60) : 0;
     }
-
     onSaveSettings({ weeklyMinutes });
   };
+
+  const syncLabel = {
+    idle: "Aguardando sincronizacao de feriados",
+    syncing: "Sincronizando feriados do ano atual...",
+    ready: "Feriados do ano atual carregados",
+    error: "Nao foi possivel sincronizar agora"
+  }[holidaySyncStatus || "idle"];
 
   return (
     <section className="page">
       <section className="card">
         <h2>Jornada por dia da semana</h2>
-        <p className="helper">Exemplo: quinta 8h, sexta 9h.</p>
+        <p className="helper">Defina horas diferentes por dia, ex.: quinta 8h e sexta 9h.</p>
         <div className="weekday-grid">
           {labels.map((label, day) => {
             const active = Number(weeklyHours[day] || 0) > 0;
@@ -57,16 +65,22 @@ function SettingsPage({ settings, holidays, onSaveSettings, onAddHoliday, onDele
             );
           })}
         </div>
-        <button onClick={save}>Salvar configuracoes</button>
+        <button className="btn-primary" onClick={save}>Salvar configuracoes</button>
       </section>
 
       <section className="card">
-        <h2>Feriados</h2>
+        <div className="section-head">
+          <h2>Feriados</h2>
+          <span className={`sync-badge ${holidaySyncStatus}`}>{syncLabel}</span>
+        </div>
+
         <HolidayForm onAdd={onAddHoliday} />
+
         <ul className="holiday-list">
           {holidays.map((holiday) => (
             <li key={holiday.id}>
               <span>{holiday.date} - {holiday.name}</span>
+              <small>{holiday.source === "api" ? "API" : "Manual"}</small>
               <button className="danger" onClick={() => onDeleteHoliday(holiday.id)}>Remover</button>
             </li>
           ))}

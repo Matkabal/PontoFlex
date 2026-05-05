@@ -41,20 +41,24 @@ function HomePage({ settings, holidays }) {
   };
 
   const addPoint = (time) => syncPoints([...points, { id: crypto.randomUUID(), time }]);
-
-  const updatePoint = (id, time) =>
-    syncPoints(points.map((item) => (item.id === id ? { ...item, time } : item)));
-
+  const updatePoint = (id, time) => syncPoints(points.map((item) => (item.id === id ? { ...item, time } : item)));
   const deletePoint = (id) => syncPoints(points.filter((item) => item.id !== id));
 
   return (
     <section className="page">
-      <section className="card hero-card">
-        <h2>{format(new Date(), "dd/MM/yyyy")}</h2>
-        <p>Adicione os horarios do dia. O app monta pares automaticamente.</p>
+      <section className="hero-card card">
+        <div>
+          <h2>{format(new Date(), "dd/MM/yyyy")}</h2>
+          <p>Insira seus horarios e o PontoFlex calcula automaticamente suas sessoes e saldo.</p>
+        </div>
+        <span className="hero-tag">{openSession ? "Jornada aberta" : "Jornada fechada"}</span>
       </section>
-      <StatusCard working={Boolean(openSession)} />
-      <TodaySummary workedMinutes={workedMinutes} expectedMinutes={expectedMinutes} />
+
+      <div className="home-grid">
+        <StatusCard working={Boolean(openSession)} />
+        <TodaySummary workedMinutes={workedMinutes} expectedMinutes={expectedMinutes} />
+      </div>
+
       {error ? <p className="error">{error}</p> : null}
       <TimePointsEditor points={points} onAdd={addPoint} onUpdate={updatePoint} onDelete={deletePoint} />
     </section>

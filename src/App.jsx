@@ -7,14 +7,14 @@ import { useSettings } from "./hooks/useSettings";
 
 function App() {
   const [tab, setTab] = useState("home");
-  const { settings, holidays, saveSettings, addHoliday, deleteHoliday } = useSettings();
+  const { settings, holidays, holidaySyncStatus, saveSettings, addHoliday, deleteHoliday } = useSettings();
 
   return (
     <div className="app">
       <header className="header">
-        <div>
+        <div className="brand-wrap">
           <h1>PontoFlex</h1>
-          <p>Controle de ponto pessoal offline</p>
+          <p>Gestao inteligente de jornada pessoal</p>
         </div>
         <TopNav current={tab} onChange={setTab} />
       </header>
@@ -26,6 +26,7 @@ function App() {
           <SettingsPage
             settings={settings}
             holidays={holidays}
+            holidaySyncStatus={holidaySyncStatus}
             onSaveSettings={saveSettings}
             onAddHoliday={addHoliday}
             onDeleteHoliday={deleteHoliday}

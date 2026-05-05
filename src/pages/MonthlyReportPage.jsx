@@ -19,10 +19,12 @@ function MonthlyReportPage({ settings, holidays }) {
         <ul className="report-list">
           {rows.map((item) => (
             <li key={item.date}>
-              <span>{item.date}</span>
+              <span className="date">{item.date}</span>
               <span>Trabalhado: {formatWorkedMinutes(item.workedMinutes)}</span>
               <span>Esperado: {formatWorkedMinutes(item.expectedMinutes)}</span>
-              <span>Saldo: {formatMinutesToHHMM(item.balanceMinutes)}</span>
+              <span className={item.balanceMinutes >= 0 ? "balance-pos" : "balance-neg"}>
+                Saldo: {formatMinutesToHHMM(item.balanceMinutes)}
+              </span>
             </li>
           ))}
         </ul>
@@ -32,7 +34,9 @@ function MonthlyReportPage({ settings, holidays }) {
         <h3>Total do mes</h3>
         <p>Trabalhado: {formatWorkedMinutes(totals.worked)}</p>
         <p>Esperado: {formatWorkedMinutes(totals.expected)}</p>
-        <p>Saldo: {formatMinutesToHHMM(totals.balance)}</p>
+        <p className={totals.balance >= 0 ? "balance-pos" : "balance-neg"}>
+          Saldo: {formatMinutesToHHMM(totals.balance)}
+        </p>
       </section>
     </section>
   );

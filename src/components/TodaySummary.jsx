@@ -4,19 +4,19 @@ function TodaySummary({ workedMinutes, expectedMinutes }) {
   const balance = workedMinutes - expectedMinutes;
 
   return (
-    <section className="card summary-grid">
-      <div>
+    <section className="summary-grid">
+      <article className="kpi-card">
         <h3>Trabalhado hoje</h3>
         <strong>{formatWorkedMinutes(workedMinutes)}</strong>
-      </div>
-      <div>
+      </article>
+      <article className="kpi-card">
         <h3>Esperado hoje</h3>
         <strong>{formatWorkedMinutes(expectedMinutes)}</strong>
-      </div>
-      <div>
+      </article>
+      <article className="kpi-card">
         <h3>Saldo do dia</h3>
         <strong>{formatMinutesToHHMM(balance)}</strong>
-      </div>
+      </article>
     </section>
   );
 }

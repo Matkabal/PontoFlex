@@ -1,18 +1,37 @@
 ﻿import { useEffect, useState } from "react";
 import { db, ensureDefaultSettings, getDefaultSettings } from "../db/db";
+import { ensureYearHolidays } from "../utils/holidaySync";
 
 const defaultSettings = getDefaultSettings();
 
 export function useSettings() {
   const [settings, setSettings] = useState(defaultSettings);
   const [holidays, setHolidays] = useState([]);
+  const [holidaySyncStatus, setHolidaySyncStatus] = useState("idle");
 
   const load = async () => {
     await ensureDefaultSettings();
+
+    const currentYear = new Date().getFullYear();
     const saved = await db.settings.get("main");
     setSettings(saved || defaultSettings);
-    const holidayRows = await db.holidays.orderBy("date").toArray();
-    setHolidays(holidayRows);
+
+    const yearRows = await db.holidays.where("year").equals(currentYear).sortBy("date");
+
+    if (yearRows.length === 0) {
+      try {
+        setHolidaySyncStatus("syncing");
+        await ensureYearHolidays(currentYear);
+        setHolidaySyncStatus("ready");
+      } catch {
+        setHolidaySyncStatus("error");
+      }
+    } else {
+      setHolidaySyncStatus("ready");
+    }
+
+    const refreshedRows = await db.holidays.where("year").equals(currentYear).sortBy("date");
+    setHolidays(refreshedRows);
   };
 
   useEffect(() => {
@@ -39,7 +58,11 @@ export function useSettings() {
   };
 
   const addHoliday = async (holiday) => {
-    await db.holidays.add(holiday);
+    await db.holidays.add({
+      ...holiday,
+      year: Number(String(holiday.date).slice(0, 4)),
+      source: "manual"
+    });
     await load();
   };
 
@@ -48,5 +71,13 @@ export function useSettings() {
     await load();
   };
 
-  return { settings, holidays, saveSettings, addHoliday, deleteHoliday, reloadSettings: load };
+  return {
+    settings,
+    holidays,
+    holidaySyncStatus,
+    saveSettings,
+    addHoliday,
+    deleteHoliday,
+    reloadSettings: load
+  };
 }
