@@ -1,6 +1,15 @@
 ﻿import { endOfDay, startOfDay } from "date-fns";
 import { db } from "../db/db";
 
+function parseISODateLocal(value) {
+  if (value instanceof Date) return new Date(value);
+  if (typeof value === "string") {
+    const [year, month, day] = value.split("-").map(Number);
+    if (year && month && day) return new Date(year, month - 1, day, 12, 0, 0, 0);
+  }
+  return new Date(value);
+}
+
 function toDateTimeISO(baseDate, hhmm) {
   const [hours, minutes] = hhmm.split(":").map(Number);
   const next = new Date(baseDate);
@@ -10,7 +19,7 @@ function toDateTimeISO(baseDate, hhmm) {
 
 export function usePunchActions(reload) {
   const replacePointsByDate = async (baseDateInput, points) => {
-    const baseDate = new Date(baseDateInput);
+    const baseDate = parseISODateLocal(baseDateInput);
     const start = startOfDay(baseDate).toISOString();
     const end = endOfDay(baseDate).toISOString();
 

@@ -1,4 +1,4 @@
-﻿import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { addMonths, endOfMonth, format, isSameMonth, parseISO, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useMonthlyReport } from "../hooks/useMonthlyReport";
@@ -9,7 +9,6 @@ import { buildPointsFromAggregatedRow, parseMonthlyCsvText } from "../utils/impo
 import MonthlyWorkChart from "../components/MonthlyWorkChart";
 import MonthlyOvertimeChart from "../components/MonthlyOvertimeChart";
 import ReportFilters from "../components/ReportFilters";
-import DayTimeEditor from "../components/DayTimeEditor";
 
 function MonthlyReportPage({ settings, holidays }) {
   const [referenceDate, setReferenceDate] = useState(new Date());
@@ -34,33 +33,6 @@ function MonthlyReportPage({ settings, holidays }) {
   }, [referenceDate, rows, today]);
 
   const activeDate = selectedDate || defaultDate;
-  const dayDetail = rows.find((r) => r.date === activeDate) || rows[0] || null;
-
-  const dayPoints = useMemo(() => {
-    if (!dayDetail) return [];
-    const points = [];
-    dayDetail.sessions.forEach((session) => {
-      points.push({ id: `${session.id}-in`, time: format(new Date(session.start), "HH:mm") });
-      if (session.end) points.push({ id: `${session.id}-out`, time: format(new Date(session.end), "HH:mm") });
-    });
-    return points.sort((a, b) => a.time.localeCompare(b.time));
-  }, [dayDetail]);
-
-  const syncDayPoints = async (nextPoints) => {
-    if (!activeDate) return;
-    try {
-      setError("");
-      await replacePointsByDate(activeDate, nextPoints);
-      setSelectedDate(activeDate);
-      reloadReport();
-    } catch (e) {
-      setError(e.message || "Erro ao salvar horários do dia.");
-    }
-  };
-
-  const addPoint = (time) => syncDayPoints([...dayPoints, { id: crypto.randomUUID(), time }]);
-  const updatePoint = (id, time) => syncDayPoints(dayPoints.map((item) => (item.id === id ? { ...item, time } : item)));
-  const deletePoint = (id) => syncDayPoints(dayPoints.filter((item) => item.id !== id));
 
   const handleImportClick = () => {
     setImportStatus("");
@@ -86,7 +58,7 @@ function MonthlyReportPage({ settings, holidays }) {
         const hasData = existingByDate.get(row.date);
         if (hasData) {
           const confirmOverwrite = window.confirm(
-            `O dia ${row.date} já possui registros. Deseja sobrescrever os horários desse dia?`
+            `O dia ${row.date} ja possui registros. Deseja sobrescrever os horarios desse dia?`
           );
           if (!confirmOverwrite) {
             skipped += 1;
@@ -100,7 +72,7 @@ function MonthlyReportPage({ settings, holidays }) {
       }
 
       reloadReport();
-      setImportStatus(`Importação concluída. Dias importados: ${imported}. Dias ignorados: ${skipped}.`);
+      setImportStatus(`Importacao concluida. Dias importados: ${imported}. Dias ignorados: ${skipped}.`);
     } catch (e) {
       setError(e.message || "Falha ao importar CSV.");
       setImportStatus("");
@@ -115,16 +87,16 @@ function MonthlyReportPage({ settings, holidays }) {
   return (
     <section className="page">
       <section className="card month-nav">
-        <button onClick={() => { setReferenceDate(addMonths(referenceDate, -1)); setSelectedDate(null); }}>Mês anterior</button>
+        <button onClick={() => { setReferenceDate(addMonths(referenceDate, -1)); setSelectedDate(null); }}>Mes anterior</button>
         <h2>{format(referenceDate, "MMMM 'de' yyyy", { locale: ptBR })}</h2>
-        <button onClick={() => { setReferenceDate(addMonths(referenceDate, 1)); setSelectedDate(null); }}>Próximo mês</button>
+        <button onClick={() => { setReferenceDate(addMonths(referenceDate, 1)); setSelectedDate(null); }}>Proximo mes</button>
       </section>
 
       <section className="report-summary-grid">
-        <article className="kpi-card"><h3>Trabalhado no mês</h3><strong>{formatWorkedMinutes(totals.worked)}</strong></article>
-        <article className="kpi-card"><h3>Esperado no mês</h3><strong>{formatWorkedMinutes(totals.expected)}</strong></article>
-        <article className="kpi-card"><h3>Falta no mês</h3><strong>{formatWorkedMinutes(faltaTotal)}</strong></article>
-        <article className="kpi-card"><h3>Hora extra no mês</h3><strong>{formatWorkedMinutes(extraTotal)}</strong></article>
+        <article className="kpi-card"><h3>Trabalhado no mes</h3><strong>{formatWorkedMinutes(totals.worked)}</strong></article>
+        <article className="kpi-card"><h3>Esperado no mes</h3><strong>{formatWorkedMinutes(totals.expected)}</strong></article>
+        <article className="kpi-card"><h3>Falta no mes</h3><strong>{formatWorkedMinutes(faltaTotal)}</strong></article>
+        <article className="kpi-card"><h3>Hora extra no mes</h3><strong>{formatWorkedMinutes(extraTotal)}</strong></article>
         <article className="kpi-card"><h3>Saldo total</h3><strong className={totals.balance >= 0 ? "balance-pos" : "balance-neg"}>{formatMinutesToHHMM(totals.balance)}</strong></article>
       </section>
 
@@ -142,13 +114,14 @@ function MonthlyReportPage({ settings, holidays }) {
         className="hidden-input"
       />
       {importStatus ? <p className="helper">{importStatus}</p> : null}
+      {error ? <p className="error">{error}</p> : null}
 
       <MonthlyWorkChart data={workedVsExpectedSeries} />
       <MonthlyOvertimeChart data={dailyBalanceSeries} />
 
       <section className="card">
         <div className="section-head">
-          <h3>Dias no relatório</h3>
+          <h3>Dias no relatorio</h3>
           <span>{filteredRows.length} dia(s)</span>
         </div>
         <ul className="report-list monthly-list-selectable">
@@ -165,7 +138,7 @@ function MonthlyReportPage({ settings, holidays }) {
 
       {activeDate ? (
         <section>
-          <label className="helper">Selecionar dia:</label>
+          <label className="helper">Selecionar dia para foco no relatorio:</label>
           <input
             type="date"
             value={activeDate}
@@ -173,19 +146,8 @@ function MonthlyReportPage({ settings, holidays }) {
             min={minMonthDate}
             max={maxMonthDate}
           />
+          <p className="helper">Para editar horarios, use a aba Lancamentos.</p>
         </section>
-      ) : null}
-
-      {activeDate && dayDetail ? (
-        <DayTimeEditor
-          selectedDate={activeDate}
-          row={dayDetail}
-          points={dayPoints}
-          onAdd={addPoint}
-          onUpdate={updatePoint}
-          onDelete={deletePoint}
-          error={error}
-        />
       ) : null}
     </section>
   );

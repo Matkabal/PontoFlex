@@ -1,9 +1,10 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TopNav from "./components/TopNav";
 import AppMenuDrawer from "./components/AppMenuDrawer";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingsPage";
 import MonthlyReportPage from "./pages/MonthlyReportPage";
+import EntriesPage from "./pages/EntriesPage";
 import HelpPage from "./pages/HelpPage";
 import { useSettings } from "./hooks/useSettings";
 
@@ -45,13 +46,14 @@ function App() {
       <header className="header">
         <div className="brand-wrap">
           <h1>PontoFlex</h1>
-          <p>Gestão inteligente de jornada pessoal</p>
+          <p>Gestao inteligente de jornada pessoal</p>
         </div>
         <TopNav current={tab} onChange={setTab} onToggleMenu={() => setMenuOpen(true)} />
       </header>
 
       <main>
         {tab === "home" ? <HomePage settings={settings} holidays={holidays} /> : null}
+        {tab === "entries" ? <EntriesPage settings={settings} holidays={holidays} /> : null}
         {tab === "report" ? <MonthlyReportPage settings={settings} holidays={holidays} /> : null}
         {tab === "settings" ? (
           <SettingsPage
@@ -68,7 +70,7 @@ function App() {
 
       <footer className="app-footer">
         <small>
-          © {new Date().getFullYear()} PontoFlex. Todos os direitos reservados. Reprodução, cópia ou distribuição sem autorização é proibida.
+          � {new Date().getFullYear()} PontoFlex. Todos os direitos reservados. Reproducao, copia ou distribuicao sem autorizacao e proibida.
         </small>
       </footer>
 
