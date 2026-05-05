@@ -14,7 +14,7 @@ function App() {
       <header className="header">
         <div className="brand-wrap">
           <h1>PontoFlex</h1>
-          <p>Gestao inteligente de jornada pessoal</p>
+          <p>Gestão inteligente de jornada pessoal</p>
         </div>
         <TopNav current={tab} onChange={setTab} />
       </header>

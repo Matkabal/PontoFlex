@@ -10,9 +10,9 @@ function MonthlyReportPage({ settings, holidays }) {
   return (
     <section className="page">
       <section className="card month-nav">
-        <button onClick={() => setReferenceDate(addMonths(referenceDate, -1))}>Mes anterior</button>
+        <button onClick={() => setReferenceDate(addMonths(referenceDate, -1))}>Mês anterior</button>
         <h2>{format(referenceDate, "MMMM yyyy")}</h2>
-        <button onClick={() => setReferenceDate(addMonths(referenceDate, 1))}>Proximo mes</button>
+        <button onClick={() => setReferenceDate(addMonths(referenceDate, 1))}>Próximo mês</button>
       </section>
 
       <section className="card">
@@ -31,7 +31,7 @@ function MonthlyReportPage({ settings, holidays }) {
       </section>
 
       <section className="card totals">
-        <h3>Total do mes</h3>
+        <h3>Total do mês</h3>
         <p>Trabalhado: {formatWorkedMinutes(totals.worked)}</p>
         <p>Esperado: {formatWorkedMinutes(totals.expected)}</p>
         <p className={totals.balance >= 0 ? "balance-pos" : "balance-neg"}>

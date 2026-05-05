@@ -18,7 +18,7 @@ export function usePunchActions(reload) {
 
     for (let i = 1; i < sorted.length; i += 1) {
       if (sorted[i].time === sorted[i - 1].time) {
-        throw new Error("Existem horarios duplicados. Ajuste antes de salvar.");
+        throw new Error("Existem horários duplicados. Ajuste antes de salvar.");
       }
     }
 

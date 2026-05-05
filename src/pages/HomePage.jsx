@@ -36,7 +36,7 @@ function HomePage({ settings, holidays }) {
       setError("");
       await replaceTodayFromPoints(nextPoints);
     } catch (e) {
-      setError(e.message || "Erro ao processar horarios.");
+      setError(e.message || "Erro ao processar horários.");
     }
   };
 
@@ -49,7 +49,7 @@ function HomePage({ settings, holidays }) {
       <section className="hero-card card">
         <div>
           <h2>{format(new Date(), "dd/MM/yyyy")}</h2>
-          <p>Insira seus horarios e o PontoFlex calcula automaticamente suas sessoes e saldo.</p>
+          <p>Insira seus horários e o PontoFlex calcula automaticamente suas sessões e saldo.</p>
         </div>
         <span className="hero-tag">{openSession ? "Jornada aberta" : "Jornada fechada"}</span>
       </section>

@@ -19,7 +19,7 @@ function SettingsPage({
     setWeeklyHours(next);
   }, [settings]);
 
-  const labels = useMemo(() => ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"], []);
+  const labels = useMemo(() => ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"], []);
 
   const setDayHours = (day, value) => setWeeklyHours((prev) => ({ ...prev, [day]: value }));
   const toggleDay = (day) => setWeeklyHours((prev) => ({ ...prev, [day]: prev[day] > 0 ? 0 : 8 }));
@@ -34,10 +34,10 @@ function SettingsPage({
   };
 
   const syncLabel = {
-    idle: "Aguardando sincronizacao de feriados",
+    idle: "Aguardando sincronização de feriados",
     syncing: "Sincronizando feriados do ano atual...",
     ready: "Feriados do ano atual carregados",
-    error: "Nao foi possivel sincronizar agora"
+    error: "Não foi possível sincronizar agora"
   }[holidaySyncStatus || "idle"];
 
   return (
@@ -65,7 +65,7 @@ function SettingsPage({
             );
           })}
         </div>
-        <button className="btn-primary" onClick={save}>Salvar configuracoes</button>
+        <button className="btn-primary" onClick={save}>Salvar configurações</button>
       </section>
 
       <section className="card">

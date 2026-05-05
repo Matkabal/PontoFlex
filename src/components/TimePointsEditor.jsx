@@ -13,8 +13,8 @@ function TimePointsEditor({ points, onAdd, onUpdate, onDelete }) {
   return (
     <section className="card">
       <div className="section-head">
-        <h2>Lancamentos do dia</h2>
-        <span>{points.length} horario(s)</span>
+        <h2>Lançamentos do dia</h2>
+        <span>{points.length} horário(s)</span>
       </div>
 
       <form className="time-form" onSubmit={submit}>
@@ -26,7 +26,7 @@ function TimePointsEditor({ points, onAdd, onUpdate, onDelete }) {
         {points.map((point, index) => (
           <li key={point.id} className="point-item">
             <div className="point-meta">
-              <strong>{index % 2 === 0 ? "Entrada" : "Saida"}</strong>
+              <strong>{index % 2 === 0 ? "Entrada" : "Saída"}</strong>
               <span>{point.time}</span>
             </div>
             <div className="point-actions">
