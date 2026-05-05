@@ -9,10 +9,10 @@ function toDateTimeISO(baseDate, hhmm) {
 }
 
 export function usePunchActions(reload) {
-  const replaceTodayFromPoints = async (points) => {
-    const today = new Date();
-    const start = startOfDay(today).toISOString();
-    const end = endOfDay(today).toISOString();
+  const replacePointsByDate = async (baseDateInput, points) => {
+    const baseDate = new Date(baseDateInput);
+    const start = startOfDay(baseDate).toISOString();
+    const end = endOfDay(baseDate).toISOString();
 
     const sorted = [...points].sort((a, b) => a.time.localeCompare(b.time));
 
@@ -32,14 +32,18 @@ export function usePunchActions(reload) {
         const endPoint = sorted[i + 1];
 
         await db.sessions.add({
-          start: toDateTimeISO(today, startPoint.time),
-          end: endPoint ? toDateTimeISO(today, endPoint.time) : null
+          start: toDateTimeISO(baseDate, startPoint.time),
+          end: endPoint ? toDateTimeISO(baseDate, endPoint.time) : null
         });
       }
     });
 
-    await reload();
+    if (reload) {
+      await reload();
+    }
   };
 
-  return { replaceTodayFromPoints };
+  const replaceTodayFromPoints = async (points) => replacePointsByDate(new Date(), points);
+
+  return { replaceTodayFromPoints, replacePointsByDate };
 }

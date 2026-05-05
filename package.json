@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "pwa:gerar": "powershell -ExecutionPolicy Bypass -File ./scripts/gerar-pwa.ps1"
   },
   "dependencies": {
     "date-fns": "^3.6.0",
     "dexie": "^4.0.8",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
