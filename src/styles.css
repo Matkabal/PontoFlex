@@ -496,3 +496,13 @@ input {
   .top-nav { overflow-x: auto; max-width: 100%; }
   .top-nav button { white-space: nowrap; }
 }
+
+.filters-actions {
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.hidden-input {
+  display: none;
+}

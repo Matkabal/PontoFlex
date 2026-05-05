@@ -7,6 +7,7 @@ import { minutesBetween } from "../utils/time";
 
 export function useMonthlyReport(refDate, settings, holidays, filters) {
   const [rows, setRows] = useState([]);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     const run = async () => {
@@ -40,7 +41,7 @@ export function useMonthlyReport(refDate, settings, holidays, filters) {
     };
 
     run();
-  }, [refDate, settings, holidays]);
+  }, [refDate, settings, holidays, reloadToken]);
 
   const totals = useMemo(
     () => rows.reduce(
@@ -85,5 +86,7 @@ export function useMonthlyReport(refDate, settings, holidays, filters) {
     });
   }, [rows, filters]);
 
-  return { rows, filteredRows, totals, workedVsExpectedSeries, dailyBalanceSeries };
+  const reloadReport = () => setReloadToken((current) => current + 1);
+
+  return { rows, filteredRows, totals, workedVsExpectedSeries, dailyBalanceSeries, reloadReport };
 }

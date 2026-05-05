@@ -1,10 +1,11 @@
-﻿import { useMemo, useState } from "react";
-import { addMonths, format, isSameMonth, parseISO } from "date-fns";
+﻿import { useMemo, useRef, useState } from "react";
+import { addMonths, endOfMonth, format, isSameMonth, parseISO, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useMonthlyReport } from "../hooks/useMonthlyReport";
 import { usePunchActions } from "../hooks/usePunchActions";
 import { formatMinutesToHHMM, formatWorkedMinutes } from "../utils/time";
 import { exportMonthlyCsv } from "../utils/exportCsv";
+import { buildPointsFromAggregatedRow, parseMonthlyCsvText } from "../utils/importCsv";
 import MonthlyWorkChart from "../components/MonthlyWorkChart";
 import MonthlyOvertimeChart from "../components/MonthlyOvertimeChart";
 import ReportFilters from "../components/ReportFilters";
@@ -15,8 +16,15 @@ function MonthlyReportPage({ settings, holidays }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [filters, setFilters] = useState({ showAllDays: false, includeWeekends: true, includeHolidays: true });
   const [error, setError] = useState("");
+  const [importStatus, setImportStatus] = useState("");
+  const importInputRef = useRef(null);
 
-  const { rows, filteredRows, totals, workedVsExpectedSeries, dailyBalanceSeries } = useMonthlyReport(referenceDate, settings, holidays, filters);
+  const { rows, filteredRows, totals, workedVsExpectedSeries, dailyBalanceSeries, reloadReport } = useMonthlyReport(
+    referenceDate,
+    settings,
+    holidays,
+    filters
+  );
   const { replacePointsByDate } = usePunchActions();
 
   const today = new Date();
@@ -44,6 +52,7 @@ function MonthlyReportPage({ settings, holidays }) {
       setError("");
       await replacePointsByDate(activeDate, nextPoints);
       setSelectedDate(activeDate);
+      reloadReport();
     } catch (e) {
       setError(e.message || "Erro ao salvar horários do dia.");
     }
@@ -53,8 +62,55 @@ function MonthlyReportPage({ settings, holidays }) {
   const updatePoint = (id, time) => syncDayPoints(dayPoints.map((item) => (item.id === id ? { ...item, time } : item)));
   const deletePoint = (id) => syncDayPoints(dayPoints.filter((item) => item.id !== id));
 
+  const handleImportClick = () => {
+    setImportStatus("");
+    importInputRef.current?.click();
+  };
+
+  const handleImportCsv = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    try {
+      setError("");
+      setImportStatus("Lendo arquivo...");
+      const text = await file.text();
+      const parsedRows = parseMonthlyCsvText(text);
+
+      const existingByDate = new Map(rows.map((row) => [row.date, row.sessions.length > 0]));
+      let imported = 0;
+      let skipped = 0;
+
+      for (const row of parsedRows) {
+        const hasData = existingByDate.get(row.date);
+        if (hasData) {
+          const confirmOverwrite = window.confirm(
+            `O dia ${row.date} já possui registros. Deseja sobrescrever os horários desse dia?`
+          );
+          if (!confirmOverwrite) {
+            skipped += 1;
+            continue;
+          }
+        }
+
+        const syntheticPoints = buildPointsFromAggregatedRow(row);
+        await replacePointsByDate(row.date, syntheticPoints);
+        imported += 1;
+      }
+
+      reloadReport();
+      setImportStatus(`Importação concluída. Dias importados: ${imported}. Dias ignorados: ${skipped}.`);
+    } catch (e) {
+      setError(e.message || "Falha ao importar CSV.");
+      setImportStatus("");
+    }
+  };
+
   const faltaTotal = Math.max(totals.expected - totals.worked, 0);
   const extraTotal = Math.max(totals.worked - totals.expected, 0);
+  const minMonthDate = format(startOfMonth(referenceDate), "yyyy-MM-dd");
+  const maxMonthDate = format(endOfMonth(referenceDate), "yyyy-MM-dd");
 
   return (
     <section className="page">
@@ -76,7 +132,16 @@ function MonthlyReportPage({ settings, holidays }) {
         filters={filters}
         onChange={setFilters}
         onExport={() => exportMonthlyCsv(filteredRows, `relatorio-${format(referenceDate, "yyyy-MM")}.csv`)}
+        onImport={handleImportClick}
       />
+      <input
+        ref={importInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        onChange={handleImportCsv}
+        className="hidden-input"
+      />
+      {importStatus ? <p className="helper">{importStatus}</p> : null}
 
       <MonthlyWorkChart data={workedVsExpectedSeries} />
       <MonthlyOvertimeChart data={dailyBalanceSeries} />
@@ -105,8 +170,8 @@ function MonthlyReportPage({ settings, holidays }) {
             type="date"
             value={activeDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            min={format(referenceDate, "yyyy-MM-01")}
-            max={format(referenceDate, "yyyy-MM-31")}
+            min={minMonthDate}
+            max={maxMonthDate}
           />
         </section>
       ) : null}
